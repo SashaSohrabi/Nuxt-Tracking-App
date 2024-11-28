@@ -40,11 +40,18 @@
   </section>
 
   <section>
-    <Transaction
-      v-for="transaction in transactions"
-      :key="transaction.id"
-      :transaction="transaction"
-    />
+    <div
+      v-for="(transactionOnDay, date) in transactionsGroupedByDate"
+      :key="date"
+      class="mb-10"
+    >
+      <DailyTransactionSummary :date="date" :transactions="transactionOnDay" />
+      <Transaction
+        v-for="transaction in transactionOnDay"
+        :key="transaction.id"
+        :transaction="transaction"
+      />
+    </div>
   </section>
 </template>
 
@@ -71,4 +78,21 @@ const { data, pending } = await useAsyncData<Transaction[] | null>(
 );
 
 transactions.value = data.value ?? [];
+
+const transactionsGroupedByDate = computed(() => {
+  if (!transactions.value) return {};
+
+  return transactions.value.reduce<Record<string, Transaction[]>>((acc, { created_at, ...transaction }) => {
+    const date = created_at
+      ? new Date(created_at).toISOString().split('T')[0]
+      : null;
+
+    if (date) {
+      acc[date] = acc[date] || [];
+      acc[date].push({ created_at, ...transaction });
+    }
+
+    return acc;
+  }, {});
+});
 </script>

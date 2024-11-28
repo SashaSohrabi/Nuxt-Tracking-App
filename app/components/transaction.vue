@@ -11,7 +11,7 @@
         transaction.category
       }}</UBadge>
     </div>
-    <div class="flex items-center justify-end">
+    <div class="flex items-center justify-end space-x-2">
       <div>{{ currency }}</div>
       <div>
         <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
@@ -50,7 +50,7 @@ const items = [
 
 const isIncome = computed(() => props.transaction.type === 'Income');
 const icon = computed(() =>
-  isIncome.value ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-right'
+  isIncome.value ? 'i-heroicons-arrow-up-right' : 'i-heroicons-arrow-down-left'
 );
 const iconColor = computed(() =>
   isIncome.value ? 'text-green-600' : 'text-red-600'
