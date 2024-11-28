@@ -12,14 +12,14 @@
     <Trend
       color="green"
       title="Income"
-      :amount="4000"
+      :amount="incomeTotal"
       :last-amount="3000"
       :loading="isLoading"
     />
     <Trend
       color="red"
       title="Expense"
-      :amount="4000"
+      :amount="expenseTotal"
       :last-amount="5000"
       :loading="isLoading"
     />
@@ -39,6 +39,19 @@
     />
   </section>
 
+  <section class="flex justify-between mb-10">
+    <div>
+      <h2 class="text-2xl font-extrabold">Transactions</h2>
+      <div class="text-gray-500 dark:text-gray-400">
+        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses in
+        this period.
+      </div>
+    </div>
+    <div>
+      <UButton icon="i-heroicons-plus-circle" color="white" variant="solid" label="Add"/>
+    </div>
+  </section>
+
   <section v-if="!isLoading">
     <div
       v-for="(transactionOnDay, date) in transactionsGroupedByDate"
@@ -55,7 +68,7 @@
     </div>
   </section>
   <section v-else>
-    <USkeleton class="h-8 w-full mb-2" v-for="i in 4" :key="i"/>
+    <USkeleton class="h-8 w-full mb-2" v-for="i in 4" :key="i" />
   </section>
 </template>
 
@@ -67,6 +80,25 @@ const selectedView = ref<string>(TRANSACTION_VIEW_OPTIONS[1]);
 const transactions = ref<Transaction[]>([]);
 const supabase = useSupabaseClient();
 const isLoading = ref(false);
+
+const income = computed(() =>
+  transactions.value.filter((t) => t.type === 'Income')
+);
+
+const expense = computed(() =>
+  transactions.value.filter((t) => t.type === 'Expense')
+);
+
+const incomeCount = computed(() => income.value.length);
+const expenseCount = computed(() => expense.value.length);
+
+const incomeTotal = computed(() =>
+  income.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+);
+
+const expenseTotal = computed(() =>
+  expense.value.reduce((sum, transaction) => sum + transaction.amount, 0)
+);
 
 const fetchTransactions = async () => {
   try {
@@ -92,7 +124,8 @@ const fetchTransactions = async () => {
   }
 };
 
-const refreshTransactions = async () => transactions.value = await fetchTransactions() ?? [];
+const refreshTransactions = async () =>
+  (transactions.value = (await fetchTransactions()) ?? []);
 
 await refreshTransactions();
 
