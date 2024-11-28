@@ -33,7 +33,7 @@ const props = defineProps<{
   transaction: Transaction;
 }>();
 const emit = defineEmits<{
-  (e: 'deleted', id: number): void;
+  (event: 'deleted', id: number): void;
 }>();
 const { currency } = useCurrency(props.transaction.amount);
 const isLoading = ref(false);
