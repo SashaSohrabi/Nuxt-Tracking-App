@@ -14,32 +14,32 @@
       title="Income"
       :amount="4000"
       :last-amount="3000"
-      :loading="false"
+      :loading="isLoading"
     />
     <Trend
       color="red"
       title="Expense"
       :amount="4000"
       :last-amount="5000"
-      :loading="false"
+      :loading="isLoading"
     />
     <Trend
       color="green"
       title="Investments"
       :amount="4000"
       :last-amount="3000"
-      :loading="false"
+      :loading="isLoading"
     />
     <Trend
       color="red"
       title="Saving"
       :amount="4000"
       :last-amount="4100"
-      :loading="false"
+      :loading="isLoading"
     />
   </section>
 
-  <section>
+  <section v-if="!isLoading">
     <div
       v-for="(transactionOnDay, date) in transactionsGroupedByDate"
       :key="date"
@@ -50,8 +50,12 @@
         v-for="transaction in transactionOnDay"
         :key="transaction.id"
         :transaction="transaction"
+        @deleted="refreshTransactions"
       />
     </div>
+  </section>
+  <section v-else>
+    <USkeleton class="h-8 w-full mb-2" v-for="i in 4" :key="i"/>
   </section>
 </template>
 
@@ -62,37 +66,53 @@ import type { Transaction } from '~/types/index';
 const selectedView = ref<string>(TRANSACTION_VIEW_OPTIONS[1]);
 const transactions = ref<Transaction[]>([]);
 const supabase = useSupabaseClient();
+const isLoading = ref(false);
 
-const { data, pending } = await useAsyncData<Transaction[] | null>(
-  'transactions',
-  async () => {
-    const { data, error } = await supabase.from('transactions').select();
+const fetchTransactions = async () => {
+  try {
+    isLoading.value = true;
+    const { data } = await useAsyncData<Transaction[] | null>(
+      'transactions',
+      async () => {
+        const { data, error } = await supabase.from('transactions').select();
 
-    if (error) {
-      console.error('Error fetching transactions:', error);
-      return null;
-    }
+        if (error) {
+          console.error('Error fetching transactions:', error);
+          return null;
+        }
+        return data;
+      }
+    );
 
-    return data;
+    return data.value;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoading.value = false;
   }
-);
+};
 
-transactions.value = data.value ?? [];
+const refreshTransactions = async () => transactions.value = await fetchTransactions() ?? [];
+
+await refreshTransactions();
 
 const transactionsGroupedByDate = computed(() => {
   if (!transactions.value) return {};
 
-  return transactions.value.reduce<Record<string, Transaction[]>>((acc, { created_at, ...transaction }) => {
-    const date = created_at
-      ? new Date(created_at).toISOString().split('T')[0]
-      : null;
+  return transactions.value.reduce<Record<string, Transaction[]>>(
+    (acc, { created_at, ...transaction }) => {
+      const date = created_at
+        ? new Date(created_at).toISOString().split('T')[0]
+        : null;
 
-    if (date) {
-      acc[date] = acc[date] || [];
-      acc[date].push({ created_at, ...transaction });
-    }
+      if (date) {
+        acc[date] = acc[date] || [];
+        acc[date].push({ created_at, ...transaction });
+      }
 
-    return acc;
-  }, {});
+      return acc;
+    },
+    {}
+  );
 });
 </script>

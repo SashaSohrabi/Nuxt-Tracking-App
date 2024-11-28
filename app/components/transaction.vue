@@ -32,6 +32,9 @@ import type { Transaction } from '~/types/index';
 const props = defineProps<{
   transaction: Transaction;
 }>();
+const emit = defineEmits<{
+  (e: 'deleted', id: number): void;
+}>();
 const { currency } = useCurrency(props.transaction.amount);
 const isLoading = ref(false);
 const toast = useToast();
@@ -49,6 +52,7 @@ const deleteTransaction = async () => {
       description: 'The transaction has been deleted.',
       color: 'green',
     });
+    emit('deleted', props.transaction.id);
   } catch (e) {
     toast.add({
       title: 'Error deleting transaction',
