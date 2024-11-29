@@ -1,4 +1,15 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
-  "extends": "./.nuxt/tsconfig.json"
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext", // Ensure compatibility with ESM
+    "target": "ESNext", // Use modern JavaScript features
+    "moduleResolution": "node", // Resolve modules like Node.js
+    "strict": true, // Enable strict type checking
+    "esModuleInterop": true, // Allow interoperability between ESM and CommonJS
+    "skipLibCheck": true // Skip checking library files for performance
+  },
+  "ts-node": {
+    "esm": true // Ensure `ts-node` runs in ESM mode
+  }
 }

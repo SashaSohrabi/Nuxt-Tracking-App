@@ -7,14 +7,17 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "seed": "node --loader ts-node/esm seed.ts"
   },
   "dependencies": {
     "@nuxt/ui": "^2.19.2",
     "@nuxtjs/supabase": "^1.4.3",
-    "nuxt": "^3.14.159"
+    "nuxt": "^3.14.159",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
     "zod": "^3.23.8"
   }
 }
