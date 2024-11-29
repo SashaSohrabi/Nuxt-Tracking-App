@@ -55,7 +55,13 @@
             v-model="state.category"
           />
         </UFormGroup>
-        <UButton type="submit" color="black" variant="solid" label="Save" />
+        <UButton
+          type="submit"
+          color="black"
+          variant="solid"
+          label="Save"
+          :isLoading="isLoading"
+        />
       </UForm>
     </UCard>
   </UModal>
@@ -71,6 +77,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
+  (event: 'saved'): void;
 }>();
 
 const defaultSchema = z.object({
@@ -108,23 +115,11 @@ const schema = z.intersection(
   defaultSchema
 );
 
-const form = useTemplateRef('form');
-
-const save = async () => {
-  const formData = await form.value;
-  if (schema.safeParse(formData)) {
-    // Save the transaction to the database
-    // Emit the updated modelValue
-    console.log(form.value);
-    isOpen.value = false;
-  }
-};
-
 const initialState = ref<TransactionState>({
   type: '',
   amount: 0,
   created_at: '',
-  description: '',
+  description: undefined,
   category: '',
 });
 
@@ -132,9 +127,48 @@ const state = ref<TransactionState>({
   type: '',
   amount: 0,
   created_at: '',
-  description: '',
+  description: undefined,
   category: '',
 });
+
+const isLoading = ref(false);
+const form = useTemplateRef('form');
+const supabase = useSupabaseClient();
+const toast = useToast();
+
+const save = async () => {
+  const formData = await form.value;
+  if (schema.safeParse(formData)) {
+    isLoading.value = true;
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .upsert({ ...state.value } as any);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.add({
+        title: 'Transaction saved!',
+        icon: 'i-heroicons-check-circle',
+        color: 'green',
+      });
+
+      isOpen.value = false;
+      emit('saved');
+    } catch (e) {
+      toast.add({
+        title: 'Error saving transaction',
+        description: (e as Error).message,
+        icon: 'i-heroicons-exclamation-circle',
+        color: 'red',
+      });
+    } finally {
+      isLoading.value = false;
+    }
+  }
+};
 
 const resetForm = () => {
   state.value = { ...initialState.value };
