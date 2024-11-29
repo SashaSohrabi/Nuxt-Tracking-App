@@ -48,7 +48,7 @@
       </div>
     </div>
     <div>
-     <TransactionModal v-model="isOpen"/>
+      <TransactionModal v-model="isOpen" />
       <UButton
         icon="i-heroicons-plus-circle"
         color="white"
@@ -114,7 +114,10 @@ const fetchTransactions = async () => {
     const { data } = await useAsyncData<Transaction[] | null>(
       'transactions',
       async () => {
-        const { data, error } = await supabase.from('transactions').select();
+        const { data, error } = await supabase
+          .from('transactions')
+          .select()
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching transactions:', error);
