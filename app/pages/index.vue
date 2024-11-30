@@ -60,11 +60,7 @@
   </section>
 
   <section v-if="!pending">
-    <div
-      v-for="(transactionOnDay, date) in byDate"
-      :key="date"
-      class="mb-10"
-    >
+    <div v-for="(transactionOnDay, date) in byDate" :key="date" class="mb-10">
       <DailyTransactionSummary :date="date" :transactions="transactionOnDay" />
       <Transaction
         v-for="transaction in transactionOnDay"
@@ -85,6 +81,8 @@ import { useFetchTransactions } from '~/composables/useFetchTransactions';
 
 const selectedView = ref<string>(TRANSACTION_VIEW_OPTIONS[1]);
 const isOpen = ref(false);
+const dates = useSelectedTimePeriod(selectedView);
+
 const {
   transactions: {
     grouped: { byDate },
