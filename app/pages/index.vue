@@ -13,15 +13,17 @@
       color="green"
       title="Income"
       :amount="incomeTotal"
-      :last-amount="3000"
+      :last-amount="previousIncomeTotal"
       :loading="pending"
+      :key="incomeTotal"
     />
     <Trend
       color="red"
       title="Expense"
       :amount="expenseTotal"
-      :last-amount="5000"
+      :last-amount="previousExpenseTotal"
       :loading="pending"
+      :key="expenseTotal"
     />
     <Trend
       color="green"
@@ -81,7 +83,7 @@ import { useFetchTransactions } from '~/composables/useFetchTransactions';
 
 const selectedView = ref<string>(TRANSACTION_VIEW_OPTIONS[1]);
 const isOpen = ref(false);
-const dates = useSelectedTimePeriod(selectedView);
+const { current, previous } = useSelectedTimePeriod(selectedView);
 
 const {
   transactions: {
@@ -93,7 +95,15 @@ const {
   },
   refresh,
   pending,
-} = useFetchTransactions();
+} = useFetchTransactions(current);
 
-await refresh();
+const {
+  transactions: {
+    incomeTotal: previousIncomeTotal,
+    expenseTotal: previousExpenseTotal,
+  },
+  refresh: refreshPrevious,
+} = useFetchTransactions(previous);
+
+await Promise.all([refresh(), refreshPrevious()]);
 </script>
