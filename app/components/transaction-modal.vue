@@ -134,7 +134,7 @@ const state = ref<TransactionState>({
 const isLoading = ref(false);
 const form = useTemplateRef('form');
 const supabase = useSupabaseClient();
-const toast = useToast();
+const { toastSuccess, toastError } = useAppToast();
 
 const save = async () => {
   const formData = await form.value;
@@ -149,20 +149,16 @@ const save = async () => {
         throw error;
       }
 
-      toast.add({
+      toastSuccess({
         title: 'Transaction saved!',
-        icon: 'i-heroicons-check-circle',
-        color: 'green',
       });
 
       isOpen.value = false;
       emit('saved');
     } catch (e) {
-      toast.add({
+      toastError({
         title: 'Error saving transaction',
         description: (e as Error).message,
-        icon: 'i-heroicons-exclamation-circle',
-        color: 'red',
       });
     } finally {
       isLoading.value = false;

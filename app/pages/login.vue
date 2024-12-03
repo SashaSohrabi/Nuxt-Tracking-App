@@ -41,7 +41,7 @@
 const success = ref(false);
 const email = ref('');
 const pending = ref(false);
-const toast = useToast();
+const { toastSuccess } = useAppToast();
 const supabase = useSupabaseClient();
 
 useRedirectIfAuthenticated();
@@ -63,7 +63,7 @@ const handleSubmit = async () => {
       success.value = true;
     }
   } catch (error) {
-    toast.add({
+    toastSuccess({
       title: 'Error signing in',
       icon: 'i-heroicons-exclamation-circle',
       description: (error as Error).message,
