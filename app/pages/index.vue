@@ -81,7 +81,10 @@
 import { TRANSACTION_VIEW_OPTIONS } from '~/utils/constants';
 import { useFetchTransactions } from '~/composables/useFetchTransactions';
 
-const selectedView = ref<string>(TRANSACTION_VIEW_OPTIONS[1]);
+const user = useSupabaseUser();
+const selectedView = ref<string>(
+  user.value?.user_metadata.transaction_view ?? TRANSACTION_VIEW_OPTIONS[0]
+);
 const isOpen = ref(false);
 const { current, previous } = useSelectedTimePeriod(selectedView);
 
