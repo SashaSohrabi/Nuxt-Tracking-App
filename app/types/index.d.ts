@@ -15,4 +15,9 @@ type TransactionState = {
   category: string;
 };
 
-export { Transaction, TransactionState };
+type ProfileState = {
+  fullname: string;
+  email: string | undefined;
+};
+
+export { Transaction, TransactionState, ProfileState };
