@@ -22,7 +22,7 @@
   </UForm>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { TRANSACTION_VIEW_OPTIONS } from '~/utils/constants';
 import { z } from 'zod';
 
@@ -32,7 +32,7 @@ const { toastSuccess, toastError } = useAppToast();
 const pending = ref(false);
 const state = ref({
   transactionView:
-    user.value.user_metadata?.transaction_view ?? TRANSACTION_VIEW_OPTIONS[0],
+    user.value?.user_metadata?.transaction_view ?? TRANSACTION_VIEW_OPTIONS[0],
 });
 
 console.log(user.value);
@@ -56,7 +56,7 @@ const saveSettings = async () => {
   } catch (error) {
     toastError({
       title: 'Error updating settings',
-      description: error.message,
+      description: (error as Error).message,
     });
   } finally {
     pending.value = false;
