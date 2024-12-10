@@ -1,5 +1,5 @@
 <template>
-  <UForm :state="state" :schema="schema" @submit.prevent="saveProfile">
+  <UForm :state="state" :schema="profileSchema" @submit.prevent="saveProfile">
     <UFormGroup class="mb-4" label="Full name" name="fullname">
       <UInput v-model="state.fullname" />
     </UFormGroup>
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import type { ProfileState } from '~/types/index';
-import { z } from 'zod';
+import { profileSchema } from '~/utils/schemas/profileSchema';
 
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
@@ -32,11 +32,6 @@ const pending = ref(false);
 const state = ref<ProfileState>({
   fullname: user.value?.user_metadata.fullname,
   email: user.value?.new_email || user.value?.email,
-});
-
-const schema = z.object({
-  fullname: z.string().min(3).optional(),
-  email: z.string().email(),
 });
 
 const saveProfile = async () => {

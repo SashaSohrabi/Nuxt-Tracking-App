@@ -20,7 +20,6 @@ const {
   error,
 } = await supabase.auth.admin.listUsers();
 const userIds = users.map((user) => user.id);
-console.log(userIds);
 
 interface Transaction {
   created_at: Date;

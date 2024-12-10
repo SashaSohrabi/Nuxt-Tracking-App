@@ -4,7 +4,7 @@
       <template #header>
         {{ isEditing ? 'Edit' : 'Add' }} Transaction
       </template>
-      <UForm :state="state" :schema="schema" ref="form" @submit.prevent="save">
+      <UForm :state="state" :schema="transactionSchema" ref="form" @submit.prevent="save">
         <UFormGroup
           label="Transaction Type"
           :required="true"
@@ -72,8 +72,8 @@
 
 <script setup lang="ts">
 import { CATEGORIES, TYPES } from '~/utils/constants';
+import { transactionSchema } from '~/utils/schemas/transactionSchema';
 import type { TransactionState, Transaction } from '~/types/index';
-import { z } from 'zod';
 
 const props = defineProps<{
   transaction?: Transaction;
@@ -86,47 +86,13 @@ const emit = defineEmits<{
 
 const isEditing = computed(() => !!props.transaction);
 
-const defaultSchema = z.object({
-  amount: z.number().min(1, 'Amount must be greater than 0'),
-  created_at: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: 'Invalid date format',
-  }),
-  description: z.string().optional(),
-});
-
-const incomeSchema = z.object({
-  type: z.literal('Income'),
-});
-
-const expenseSchema = z.object({
-  type: z.literal('Expense'),
-  category: z.enum(CATEGORIES),
-});
-
-const investmentSchema = z.object({
-  type: z.literal('Investment'),
-});
-
-const savingSchema = z.object({
-  type: z.literal('Saving'),
-});
-
-const schema = z.intersection(
-  z.discriminatedUnion('type', [
-    incomeSchema,
-    expenseSchema,
-    investmentSchema,
-    savingSchema,
-  ]),
-  defaultSchema
-);
-
 const initialState = computed((): TransactionState => {
   return isEditing.value
     ? {
         type: props.transaction?.type || '',
         amount: props.transaction?.amount || 0,
-        created_at: props.transaction?.created_at.split('T')[0] as string || '',
+        created_at:
+          (props.transaction?.created_at.split('T')[0] as string) || '',
         description: props.transaction?.description || undefined,
         category: props.transaction?.category || '',
       }
@@ -151,7 +117,7 @@ watch(
         category: newTransaction.category || '',
       };
     }
-  },
+  }
 );
 
 const state = ref<TransactionState>({ ...initialState.value });
@@ -163,7 +129,7 @@ const { toastSuccess, toastError } = useAppToast();
 
 const save = async () => {
   const formData = await form.value;
-  if (schema.safeParse(formData)) {
+  if (transactionSchema.safeParse(formData)) {
     isLoading.value = true;
     try {
       const { error } = await supabase

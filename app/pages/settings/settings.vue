@@ -1,5 +1,5 @@
 <template>
-  <UForm :state="state" :schema="schema" @submit.prevent="saveSettings">
+  <UForm :state="state" :schema="settingSchema" @submit.prevent="saveSettings">
     <UFormGroup
       label="Transaction View"
       class="mb-4"
@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { TRANSACTION_VIEW_OPTIONS } from '~/utils/constants';
-import { z } from 'zod';
+import { settingSchema } from '~/utils/schemas/settingSchema';
 
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
@@ -33,11 +33,6 @@ const pending = ref(false);
 const state = ref({
   transactionView:
     user.value?.user_metadata?.transaction_view ?? TRANSACTION_VIEW_OPTIONS[0],
-});
-
-console.log(user.value);
-const schema = z.object({
-  transactionView: z.enum(TRANSACTION_VIEW_OPTIONS),
 });
 
 const saveSettings = async () => {
