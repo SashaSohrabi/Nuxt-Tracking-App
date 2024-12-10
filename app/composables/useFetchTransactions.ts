@@ -72,7 +72,7 @@ export const useFetchTransactions = (
     return transactions.value.reduce<Record<string, Transaction[]>>(
       (acc, { created_at, ...transaction }) => {
         const date = created_at
-          ? new Date(created_at).toISOString().split('T')[0]
+          ? created_at.split('T')[0]
           : null;
 
         if (date) {

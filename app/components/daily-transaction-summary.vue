@@ -26,4 +26,13 @@ const sum = computed(() => {
 });
 
 const { currency } = useCurrency(sum);
+
+watch(
+  () => props.transactions,
+  (newTransaction) => {
+    if (newTransaction) {
+      currency.value = useCurrency(sum).currency.value;
+    }
+  }
+);
 </script>

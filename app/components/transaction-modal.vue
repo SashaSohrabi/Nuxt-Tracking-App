@@ -1,7 +1,9 @@
 <template>
   <UModal v-model="isOpen">
     <UCard>
-      <template #header> Add Transaction </template>
+      <template #header>
+        {{ isEditing ? 'Edit' : 'Add' }} Transaction
+      </template>
       <UForm :state="state" :schema="schema" ref="form" @submit.prevent="save">
         <UFormGroup
           label="Transaction Type"
@@ -11,6 +13,7 @@
         >
           <USelect
             placeholder="Select the transaction type"
+            :disabled="isEditing"
             :options="TYPES"
             v-model="state.type"
           />
@@ -69,16 +72,19 @@
 
 <script setup lang="ts">
 import { CATEGORIES, TYPES } from '~/utils/constants';
-import type { TransactionState } from '~/types/index';
+import type { TransactionState, Transaction } from '~/types/index';
 import { z } from 'zod';
 
 const props = defineProps<{
+  transaction?: Transaction;
   modelValue: boolean;
 }>();
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
   (event: 'saved'): void;
 }>();
+
+const isEditing = computed(() => !!props.transaction);
 
 const defaultSchema = z.object({
   amount: z.number().min(1, 'Amount must be greater than 0'),
@@ -115,21 +121,40 @@ const schema = z.intersection(
   defaultSchema
 );
 
-const initialState = ref<TransactionState>({
-  type: '',
-  amount: 0,
-  created_at: '',
-  description: undefined,
-  category: '',
+const initialState = computed((): TransactionState => {
+  return isEditing.value
+    ? {
+        type: props.transaction?.type || '',
+        amount: props.transaction?.amount || 0,
+        created_at: props.transaction?.created_at.split('T')[0] as string || '',
+        description: props.transaction?.description || undefined,
+        category: props.transaction?.category || '',
+      }
+    : {
+        type: '',
+        amount: 0,
+        created_at: '',
+        description: undefined,
+        category: '',
+      };
 });
 
-const state = ref<TransactionState>({
-  type: '',
-  amount: 0,
-  created_at: '',
-  description: undefined,
-  category: '',
-});
+watch(
+  () => props.transaction,
+  (newTransaction) => {
+    if (newTransaction) {
+      state.value = {
+        type: newTransaction.type || '',
+        amount: newTransaction.amount || 0,
+        created_at: newTransaction.created_at.split('T')[0] || '',
+        description: newTransaction.description || undefined,
+        category: newTransaction.category || '',
+      };
+    }
+  },
+);
+
+const state = ref<TransactionState>({ ...initialState.value });
 
 const isLoading = ref(false);
 const form = useTemplateRef('form');
@@ -143,7 +168,7 @@ const save = async () => {
     try {
       const { error } = await supabase
         .from('transactions')
-        .upsert({ ...state.value } as any);
+        .upsert({ ...state.value, id: props.transaction?.id } as any);
 
       if (error) {
         throw error;
