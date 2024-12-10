@@ -14,7 +14,7 @@
           <USelect
             placeholder="Select the transaction type"
             :disabled="isEditing"
-            :options="TYPES"
+            :options="[...TYPES]"
             v-model="state.type"
           />
         </UFormGroup>
@@ -54,7 +54,7 @@
         >
           <USelect
             placeholder="Category"
-            :options="CATEGORIES"
+            :options="[...CATEGORIES]"
             v-model="state.category"
           />
         </UFormGroup>

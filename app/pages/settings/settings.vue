@@ -7,7 +7,7 @@
     >
       <USelect
         v-model="state.transactionView"
-        :options="TRANSACTION_VIEW_OPTIONS"
+        :options="[...TRANSACTION_VIEW_OPTIONS]"
       />
     </UFormGroup>
 
