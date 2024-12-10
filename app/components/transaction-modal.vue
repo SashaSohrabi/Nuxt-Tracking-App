@@ -4,7 +4,12 @@
       <template #header>
         {{ isEditing ? 'Edit' : 'Add' }} Transaction
       </template>
-      <UForm :state="state" :schema="transactionSchema" ref="form" @submit.prevent="save">
+      <UForm
+        :state="state"
+        :schema="transactionSchema"
+        ref="form"
+        @submit.prevent="save"
+      >
         <UFormGroup
           label="Transaction Type"
           :required="true"
@@ -73,7 +78,7 @@
 <script setup lang="ts">
 import { CATEGORIES, TYPES } from '~/utils/constants';
 import { transactionSchema } from '~/utils/schemas/transactionSchema';
-import type { TransactionState, Transaction } from '~/types/index';
+import type { Transaction } from '~/types/index';
 
 const props = defineProps<{
   transaction?: Transaction;
@@ -84,43 +89,7 @@ const emit = defineEmits<{
   (event: 'saved'): void;
 }>();
 
-const isEditing = computed(() => !!props.transaction);
-
-const initialState = computed((): TransactionState => {
-  return isEditing.value
-    ? {
-        type: props.transaction?.type || '',
-        amount: props.transaction?.amount || 0,
-        created_at:
-          (props.transaction?.created_at.split('T')[0] as string) || '',
-        description: props.transaction?.description || undefined,
-        category: props.transaction?.category || '',
-      }
-    : {
-        type: '',
-        amount: 0,
-        created_at: '',
-        description: undefined,
-        category: '',
-      };
-});
-
-watch(
-  () => props.transaction,
-  (newTransaction) => {
-    if (newTransaction) {
-      state.value = {
-        type: newTransaction.type || '',
-        amount: newTransaction.amount || 0,
-        created_at: newTransaction.created_at.split('T')[0] || '',
-        description: newTransaction.description || undefined,
-        category: newTransaction.category || '',
-      };
-    }
-  }
-);
-
-const state = ref<TransactionState>({ ...initialState.value });
+const { state, isEditing, resetForm } = useTransactionForm(props);
 
 const isLoading = ref(false);
 const form = useTemplateRef('form');
@@ -155,10 +124,6 @@ const save = async () => {
       isLoading.value = false;
     }
   }
-};
-
-const resetForm = () => {
-  state.value = { ...initialState.value };
 };
 
 const isOpen = computed({
