@@ -4,7 +4,6 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   devtools: { enabled: true },
-  extends: ['@nuxt/ui-pro'],
   modules: ['@nuxt/ui', '@nuxtjs/supabase'],
   supabase: {
     redirect: true,

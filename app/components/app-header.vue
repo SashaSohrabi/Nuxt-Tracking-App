@@ -1,7 +1,12 @@
 <template>
   <header class="flex justify-between items-center mt-10">
     <NuxtLink to="/" class="text-xl font-bold">Finance Tracker</NuxtLink>
-    <UColorModeToggle class="ml-auto mr-5"/>
+    <UToggle
+      on-icon="i-heroicons:moon-20-solid"
+      off-icon="i-heroicons:sun-20-solid"
+      class="ml-auto mr-5"
+      v-model="isDarkMode"
+    />
     <div class="flex">
       <UDropdown
         :items="items"
@@ -36,6 +41,16 @@
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const { url } = useAvatarUrl();
+const colorMode = useColorMode();
+
+// Map the boolean toggle value to the color mode
+const isDarkMode = computed({
+  get: () => colorMode.value === 'dark',
+  set: (value) => {
+    colorMode.value = value ? 'dark' : 'light';
+  },
+});
+
 const items = [
   [
     {
