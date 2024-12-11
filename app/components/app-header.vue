@@ -1,7 +1,8 @@
 <template>
   <header class="flex justify-between items-center mt-10">
     <NuxtLink to="/" class="text-xl font-bold">Finance Tracker</NuxtLink>
-    <div>
+    <UColorModeToggle class="ml-auto mr-5"/>
+    <div class="flex">
       <UDropdown
         :items="items"
         :ui="{ item: { disabled: 'cursor-text select-text' }, width: 'w-64' }"
