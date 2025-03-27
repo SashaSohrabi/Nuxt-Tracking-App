@@ -1,4 +1,27 @@
-# Nuxt Minimal Starter
+# Nuxt Tracking 🧭
+
+A minimal Nuxt 3 app with Supabase authentication, form validation via Zod, seeded fake data, and a clean interface powered by @nuxt/ui.
+
+🌐 **Live Demo**
+
+[Click here to view the deployed app](https://nuxt-tracking.vercel.app/login)
+
+📁 **Project Structure**
+
+- `app/` – Nuxt 3 application folder (pages, components, layouts)
+- `seed.ts` – Script to populate Supabase with fake users using Faker
+- `utils/` – Shared helper functions and validation logic
+
+
+✨ **Features**
+
+- 🔒 Supabase Auth Integration  
+- ⚡️ Built with Nuxt 3  
+- 🎨 @nuxt/ui for modern styling  
+- 🧰 Zod for schema validation  
+- 📅 date-fns for date utilities  
+- 🌱 Seed script using Faker for testing data  
+- 🧑‍💻 TypeScript support
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
