@@ -94,9 +94,3 @@ yarn preview
 # bun
 bun run preview
 ```
-## Deployed Link
-
-You can access the deployed application [here](https://nuxt-tracking.vercel.app/) 🚀
-
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
